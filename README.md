@@ -70,3 +70,16 @@ Here's a breakdown of the key files and directories in this project:
 * `AdapativeRL/Elevator1/Content/MetaHumans/Hana/BP_Hana.uasset`: The Blueprint for the virtual agent, "Hana," whose behaviors are controlled by the RL agent.
 
 ---
+
+## Current Progress Stage
+
+1. Scenario 
+	User wear the headset -> walk towards the lift -> press a button of call a lift
+	Lift comes up -> opens the door for few second -> user walk inside the lift
+	User press floor label button -> Lift starts to move upside -> stop at every floor
+	Lift arrive at floor 1 -> (before opening door) Spawn virtual agent between 1 and 5 -> after some seconds lift close the door and move up again and continue same process
+	
+2. Communication side
+	2.1 Create prototype script of Q-learning algorithm in Python
+	2.2 Create prototype script for UDP communication in Python
+	2.3 Both script communicating with Unreal Engine 5.4.4
