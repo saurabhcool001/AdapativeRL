@@ -1,4 +1,4 @@
-# main_rl_server.py this is main rl class for server side.
+# main_rl_server.py
 import socket
 import json
 import time
@@ -29,7 +29,7 @@ def calculate_reward(state_data):
     Calculates a reward based on the player's behavior (the state).
     This is where you implement your reward function.
     """
-    # reward logic:
+    # Example reward logic:
     # Positive reward if player shows anxiety (retreats, panics)
     # Negative reward if player shows comfort (no movement, looks at agent)
     reward = 0.0
@@ -41,7 +41,7 @@ def calculate_reward(state_data):
         reward += 2.0   # Small reward for looking away
 
     if reward == 0.0:
-        reward = -1.0 # Small negative reward for habituated behavior
+        reward = -1.0 # Small negative reward for neutral/habituated behavior
 
     print(f"[REWARD CALC] Calculated reward: {reward}")
     return reward
