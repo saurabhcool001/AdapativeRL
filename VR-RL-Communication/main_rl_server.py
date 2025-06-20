@@ -27,21 +27,24 @@ last_action = None
 def calculate_reward(state_data):
     """
     Calculates a reward based on the player's behavior (the state).
-    This is where you implement your reward function.
+    This function is updated to use the new, simplified state representation.
     """
-    # Example reward logic:
-    # Positive reward if player shows anxiety (retreats, panics)
-    # Negative reward if player shows comfort (no movement, looks at agent)
+    # Example reward logic based on distance:
+    # - Positive reward if the user moves away (anxiety response).
+    # - Negative reward for neutral or comfort-seeking behavior.
     reward = 0.0
-    if state_data.get("panic_triggered") == True:
-        reward += 10.0  # Strong positive reward for clear anxiety signal
-    if state_data.get("distance_to_virtual_agent") == "far":
-        reward += 5.0   # Positive reward for retreating
-    if state_data.get("gaze_alignment") == False:
-        reward += 2.0   # Small reward for looking away
+    distance = state_data.get("distance_to_virtual_agent")
 
+    if distance == "far":
+        reward += 5.0   # Positive reward for retreating
+    elif distance == "medium":
+         reward += 1.0 # Slight positive reward
+    
+    # If the user is close or there's no defined distance-based reward,
+    # give a small negative reward to encourage the agent to find actions
+    # that do cause a reaction.
     if reward == 0.0:
-        reward = -1.0 # Small negative reward for neutral/habituated behavior
+        reward = -1.0 
 
     print(f"[REWARD CALC] Calculated reward: {reward}")
     return reward
@@ -58,14 +61,10 @@ def main_loop():
         state_json = data.decode('utf-8')
         state_data = json.loads(state_json) # Assumes Unreal sends a JSON string
         
-        # Discretize the state into a simple, hashable format (a tuple of values)
-        # This must match the features defined in your proposal 
         current_state = (
-            state_data.get("distance_to_virtual_agent", "far"),
-            state_data.get("gaze_alignment", False),
-            state_data.get("head_turn_angle", "aligned"),
-            state_data.get("time_since_last_reaction", "long"),
-            state_data.get("panic_triggered", False)
+            state_data.get("distance_to_virtual_agent", "unknown"),
+            state_data.get("head_turn_angle", "unknown"),
+            state_data.get("time_since_last_reaction", "unknown")
         )
         print(f"\n[RECEIVED from Unreal] State: {current_state}")
 
@@ -74,8 +73,16 @@ def main_loop():
             reward = calculate_reward(state_data)
             agent.update_q_table(last_state, last_action, reward, current_state)
 
+        # --- (CHANGE: FORCING THE FIRST ACTION) ---
         # 3. CHOOSE NEXT ACTION
-        action_to_perform = agent.choose_action(current_state)
+        if last_state is None:
+            # This is the very first loop. Force the agent to enter the lift.
+            action_to_perform = "come_in_lift"
+            print(f"[SERVER LOGIC] First run: Forcing action '{action_to_perform}'")
+        else:
+            # On all subsequent loops, let the agent choose the action.
+            action_to_perform = agent.choose_action(current_state)
+        # --- (END OF CHANGE) ---
 
         # 4. SEND ACTION TO UNREAL
         send_sock.sendto(action_to_perform.encode('utf-8'), (UNREAL_IP, UNREAL_PORT_SEND))
