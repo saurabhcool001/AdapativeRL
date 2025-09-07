@@ -87,16 +87,43 @@ void UVRUDPComponent::TickReceive()
 	}
 }
 
-void UVRUDPComponent::SendUDPMessage(const FString& Message)
+//void UVRUDPComponent::SendUDPMessage(const FString& Message)
+//{
+//	if (UDPSocket && PythonAddr.IsValid())
+//	{
+//		int32 Sent = 0;
+//		UDPSocket->SendTo((uint8*)TCHAR_TO_UTF8(*Message), Message.Len(), Sent, *PythonAddr);
+//		UE_LOG(LogTemp, Warning, TEXT("[UDP] Sent to Python: %s"), *Message);
+//	}
+//	else
+//	{
+//		UE_LOG(LogTemp, Error, TEXT("[UDP] Socket not initialized or Python address not set"));
+//	}
+//}w
+
+// The "else" block is misplaced and not associated with any "if" statement. 
+// It should be removed or properly associated with an "if" statement. 
+// Here is the corrected code:
+
+void UVRUDPComponent::SendUDPMessage(const FString& Message, const FString& TargetIP, int32 TargetPort)
 {
-	if (UDPSocket && PythonAddr.IsValid())
-	{
-		int32 Sent = 0;
-		UDPSocket->SendTo((uint8*)TCHAR_TO_UTF8(*Message), Message.Len(), Sent, *PythonAddr);
-		UE_LOG(LogTemp, Warning, TEXT("[UDP] Sent to Python: %s"), *Message);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("[UDP] Socket not initialized or Python address not set"));
-	}
+    if (UDPSocket)
+    {
+        // Create the target address dynamically
+        TSharedRef<FInternetAddr> TargetAddr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+        bool bIsValid;
+        TargetAddr->SetIp(*TargetIP, bIsValid);
+        TargetAddr->SetPort(TargetPort);
+
+        if (bIsValid)
+        {
+            int32 Sent = 0;
+            UDPSocket->SendTo((uint8*)TCHAR_TO_UTF8(*Message), Message.Len(), Sent, *TargetAddr);
+            UE_LOG(LogTemp, Warning, TEXT("[UDP] Sent to %s:%d -> %s"), *TargetIP, TargetPort, *Message);
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("[UDP] Socket not initialized"));
+    }
 }

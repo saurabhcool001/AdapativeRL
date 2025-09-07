@@ -34,8 +34,11 @@ public:
     int32 ListenPort = 5005;
 
     /** Send message to last known Python address */
+    //UFUNCTION(BlueprintCallable, Category = "UDP")
+    //void SendUDPMessage(const FString& Message);
+    
     UFUNCTION(BlueprintCallable, Category = "UDP")
-    void SendUDPMessage(const FString& Message);
+    void SendUDPMessage(const FString& Message, const FString& TargetIP = "127.0.0.1", int32 TargetPort = 6006);
 
 private:
     void SetupUDPSocket();

@@ -4,26 +4,28 @@ using UnrealBuildTool;
 
 public class Elevator1 : ModuleRules
 {
-	public Elevator1(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+    public Elevator1(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(new string[] {
-			"Core", "CoreUObject", "Engine", "InputCore",
-			"Sockets",           // ✅ Needed for FSocket
+            "Core", "CoreUObject", "Engine", "InputCore",
+            "Sockets",           // ✅ Needed for FSocket
 			"Networking",        // ✅ Needed for ISocketSubsystem
-			"NetCore"            // ✅ Required for certain endpoint types
-		});
+			"NetCore",           // ✅ Required for certain endpoint types
+            "NavigationSystem",
+            "AnimGraphRuntime" // ✅ Needed for AnimNotifyState
+        });
 
 
-        PrivateDependencyModuleNames.AddRange(new string[] {  });
+        PrivateDependencyModuleNames.AddRange(new string[] { "AIModule", "NavigationSystem" });
 
-		// Uncomment if you are using Slate UI
-		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
-		
-		// Uncomment if you are using online features
-		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
+        // Uncomment if you are using Slate UI
+        // PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
 
-		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
-	}
+        // Uncomment if you are using online features
+        // PrivateDependencyModuleNames.Add("OnlineSubsystem");
+
+        // To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+    }
 }
